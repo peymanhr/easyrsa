@@ -10,7 +10,3 @@ services:
       - ./ca:/ca:rw
       - ./openvpn:/openvpn:rw
     command: "sleep infinity"
-    # docker compose exec easyrsa bash -c 'cd easyrsa && openssl x509 -in pki/ca.crt -text -noout'
-    # docker compose exec easyrsa bash -c 'cd easyrsa && ./easyrsa build-client-full c1'
-    # docker compose exec easyrsa bash -c 'cd easyrsa && ./easyrsa build-server-full srv1'
-    # docker compose exec easyrsa /makeovpn/generate.py
