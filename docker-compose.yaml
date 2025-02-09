@@ -1,0 +1,16 @@
+services:
+  easyrsa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: peymanhr/easyrsa:1.0
+    container_name: easyrsa
+    network_mode: none
+    volumes:
+      - ./ca:/ca:rw
+      - ./openvpn:/openvpn:rw
+    command: "sleep infinity"
+    # docker compose exec easyrsa bash -c 'cd easyrsa && openssl x509 -in pki/ca.crt -text -noout'
+    # docker compose exec easyrsa bash -c 'cd easyrsa && ./easyrsa build-client-full c1'
+    # docker compose exec easyrsa bash -c 'cd easyrsa && ./easyrsa build-server-full srv1'
+    # docker compose exec easyrsa /makeovpn/generate.py

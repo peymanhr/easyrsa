@@ -1,0 +1,14 @@
+servers:
+  openvpn1:
+    host: openvpn1.example.com
+    udp:
+      port: 1194
+    tcp:
+      port: 1194
+  openvpn2:
+    host: openvpn2.example.com
+    udp:
+      port: 1050
+  
+params:
+  - "setenv REDIS "redis:6379"
