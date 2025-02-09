@@ -88,7 +88,7 @@ for cert in client_certs:
             filename = f"{cn_dir}/{name}17_{cn}.ovpn"
             data["port"] = info["udp"]["port"]
             with open(filename, "w") as f:
-                f.write(env.get_template("/tcp.conf.j2").render(data))
+                f.write(env.get_template("/udp.conf.j2").render(data))
 
         if "tcp" in info:
             filename = f"{cn_dir}/{name}06_{cn}.ovpn"
