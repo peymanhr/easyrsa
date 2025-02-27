@@ -85,18 +85,17 @@ for cert in client_certs:
                 "tls_crypt_key": tls_crypt_key}
 
         if "udp" in info:
-            filename = f"{cn_dir}/{name}17_{cn}.ovpn"
+            filename = f"{cn_dir}/{cn}_{name}_1.ovpn"
             data["port"] = info["udp"]["port"]
             with open(filename, "w") as f:
                 f.write(env.get_template("/udp.conf.j2").render(data))
 
         if "tcp" in info:
-            filename = f"{cn_dir}/{name}06_{cn}.ovpn"
+            filename = f"{cn_dir}/{cn}_{name}_2.ovpn"
             data["port"] = info["tcp"]["port"]
             with open(filename, "w") as f:
                 f.write(env.get_template("/tcp.conf.j2").render(data))
 
-    # zip_file = shutil.make_archive(cn_dir, 'zip', cn_dir)
     with zipfile.ZipFile(f"{cn_dir}.zip", 'w', zipfile.ZIP_DEFLATED) as zipf:
         for file in glob(os.path.join(cn_dir, "*")):
             zipf.write(file, os.path.basename(file))
