@@ -1,7 +1,7 @@
 client
 proto udp4
 remote {{ host }} {{ port }}
-dev tun
+dev tun0
 resolv-retry infinite
 nobind
 persist-key
@@ -13,13 +13,11 @@ cipher AES-128-GCM
 tls-client
 tls-version-min 1.2
 tls-cipher TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256
-ignore-unknown-option block-outside-dns
-setenv opt block-outside-dns
 replay-window 512 30
 tun-mtu 1500
-ping 10
-ping-restart 50
-connect-retry 5
+connect-retry 5 10
+ignore-unknown-option block-outside-dns
+setenv opt block-outside-dns
 verb 3
 <ca>
 {{ ca -}}
