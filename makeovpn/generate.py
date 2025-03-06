@@ -85,13 +85,13 @@ for cert in client_certs:
                 "tls_crypt_key": tls_crypt_key}
 
         if "udp" in info:
-            filename = f"{cn_dir}/{cn}_{name}_1.ovpn"
+            filename = f"{cn_dir}/{cn}_{name.upper()}1.ovpn"
             data["port"] = info["udp"]["port"]
             with open(filename, "w") as f:
                 f.write(env.get_template("/udp.conf.j2").render(data))
 
         if "tcp" in info:
-            filename = f"{cn_dir}/{cn}_{name}_2.ovpn"
+            filename = f"{cn_dir}/{cn}_{name.upper()}2.ovpn"
             data["port"] = info["tcp"]["port"]
             with open(filename, "w") as f:
                 f.write(env.get_template("/tcp.conf.j2").render(data))
