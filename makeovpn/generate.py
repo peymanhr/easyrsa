@@ -21,6 +21,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 import os
+import json
 import yaml
 import re
 import shutil
@@ -49,6 +50,12 @@ with open(f"{easyrsa_dir}/pki/ca.crt") as f:
 with open("/openvpn/config.yaml") as f:
     config = yaml.safe_load(f)
 
+try: 
+    with open("/openvpn/clients.json") as f:
+        clients = json.load(f)
+except FileNotFoundError as e:
+    clients = None    
+
 client_certs = [
     f for f in os.listdir(issued_dir)
     if f.endswith(".crt") and is_client_cert(os.path.join(issued_dir, f))
@@ -56,8 +63,15 @@ client_certs = [
 
 env = Environment(loader=FileSystemLoader("/makeovpn/templates"))
 
-for cert in client_certs:
+# Delete all client ovpn files
+for file in glob(f'{clients_dir}/*.zip'):
+    os.remove(file)
 
+# Filter client certs with clients.json
+client_certs = [cert for cert in client_certs if cert.split(".")[0] in clients] if clients else client_certs
+
+for cert in client_certs:
+    
     cn = cert.split(".")[0]
     
     with open(f"{easyrsa_dir}/pki/issued/{cn}.crt") as f:
@@ -67,7 +81,6 @@ for cert in client_certs:
 
     with open(f"{easyrsa_dir}/pki/private/{cn}.key") as f:
         key = f.read()
-    
 
     cn_dir = f"{clients_dir}/{cn}"
     try:
@@ -77,24 +90,26 @@ for cert in client_certs:
     
     for name, info in config["servers"].items():
 
-        data = {"host": info["host"],
-                "params": config["params"],
-                "ca": ca,
-                "cert": cert,
-                "key": key,
-                "tls_crypt_key": tls_crypt_key}
+        if not clients or clients[cn] == "all" or name in clients[cn]:
 
-        if "udp" in info:
-            filename = f"{cn_dir}/{cn}_{name.upper()}1.ovpn"
-            data["port"] = info["udp"]["port"]
-            with open(filename, "w") as f:
-                f.write(env.get_template("/udp.conf.j2").render(data))
+            data = {"host": info["host"],
+                    "params": config["params"],
+                    "ca": ca,
+                    "cert": cert,
+                    "key": key,
+                    "tls_crypt_key": tls_crypt_key}
 
-        if "tcp" in info:
-            filename = f"{cn_dir}/{cn}_{name.upper()}2.ovpn"
-            data["port"] = info["tcp"]["port"]
-            with open(filename, "w") as f:
-                f.write(env.get_template("/tcp.conf.j2").render(data))
+            if "udp" in info:
+                filename = f"{cn_dir}/{cn}_{name.upper()}1.ovpn"
+                data["port"] = info["udp"]["port"]
+                with open(filename, "w") as f:
+                    f.write(env.get_template("/udp.conf.j2").render(data))
+
+            if "tcp" in info:
+                filename = f"{cn_dir}/{cn}_{name.upper()}2.ovpn"
+                data["port"] = info["tcp"]["port"]
+                with open(filename, "w") as f:
+                    f.write(env.get_template("/tcp.conf.j2").render(data))
 
     with zipfile.ZipFile(f"{cn_dir}.zip", 'w', zipfile.ZIP_DEFLATED) as zipf:
         for file in glob(os.path.join(cn_dir, "*")):
