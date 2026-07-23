@@ -24,6 +24,7 @@ import os
 import json
 import yaml
 import re
+import requests
 import shutil
 import zipfile
 from glob import glob
@@ -50,11 +51,17 @@ with open(f"{easyrsa_dir}/pki/ca.crt") as f:
 with open("/openvpn/config.yaml") as f:
     config = yaml.safe_load(f)
 
-try: 
-    with open("/openvpn/clients.json") as f:
-        clients = json.load(f)
-except FileNotFoundError as e:
-    clients = None    
+response = requests.get('https://state.littlelambkitchen.com/list',
+                        headers={'X-API-AUTH': os.environ['API_KEY']})
+response.raise_for_status()
+clients = response.json()
+print(clients)
+
+# try:
+#     with open("/openvpn/clients.json") as f:
+#         clients = json.load(f)
+# except FileNotFoundError as e:
+#     clients = None    
 
 client_certs = [
     f for f in os.listdir(issued_dir)

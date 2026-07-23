@@ -4,7 +4,7 @@ LABEL version="1.0"
 
 RUN <<EOF
 apt-get update
-apt-get install -y easy-rsa openvpn python3 python3-pip
+apt-get install -y easy-rsa openvpn python3 python3-pip # dnsutils iputils-ping curl
 rm -rf /var/lib/apt/lists/*
 EOF
 

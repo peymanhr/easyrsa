@@ -1,3 +1,10 @@
+networks:
+  easyrsa:
+    driver: bridge
+    name: easyrsa
+    external: false
+    internal: false
+
 services:
   easyrsa:
     build:
@@ -5,7 +12,10 @@ services:
       dockerfile: Dockerfile
     image: peymanhr/easyrsa:1.0
     container_name: easyrsa
-    network_mode: none
+    environment:
+      API_KEY: ${API_KEY}
+    networks:
+      - easyrsa
     volumes:
       - ./ca:/ca:rw
       - ./openvpn:/openvpn:rw
